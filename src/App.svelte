@@ -1,25 +1,47 @@
 <script>
   import AppButton from './lib/Button.svelte'
-  import MedicationArea from './lib/MedicationArea.svelte'
+  import MedicationCard from './lib/MedicationCard.svelte'
 
+  //global (config) vars
+  const minAdultWeight = 40; // min weight (kilos)
+  const maxAdultWeight = 130; // max weight (kilos)
+  const minAdultAge = 18; // min adult age (years)
+  const maxAdultAge = 99; // max adult age (years)
+
+  //function delcaration
+  //generates a random number between the min and max
+  function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  
   //var declaration
   const currentMed = {
-    name: "Dopamine",
+    name: "Dopamine", // name of med
     doseOnHand: 400, // dose in mg
     volume: 250, // volume in mL
-    adminReason: "Hypotension",
-    dose: "5mcg/kg/min",
-    route: "IVPB (Infusion)"
+    adminReason: "Hypotension", // reason why you are administering
+    dose: "5mcg/kg/min", // dose ordered
+    route: "IVPB (Infusion)", // route to give med
+    type: "INFUSION"
   }
 
   const ptInfo = {
-    gender: "M", // gender m/f
-    weight: "176" // weight in lbs
+    gender: "", // gender m/f
+    age: 0,
+    weight: 0 // weight in lbs
   }
   
   //map inputs -> outputs
   const generateNewScenario = () => {
-    console.log("hello world!");
+    //generate pt info
+    //generate pt gender & age
+    ptInfo.gender = Math.random() < 0.5 ? "M" : "F";
+    ptInfo.age = getRandomInt(minAdultAge, maxAdultAge);
+    //generate pt weight
+    ptInfo.weightKg = getRandomInt(minAdultWeight, maxAdultWeight);
+    ptInfo.weight = Math.round(ptInfo.weightKg *2.2);
   }
 
   generateNewScenario();
@@ -28,14 +50,13 @@
 <main>
   <h1>Med Math Practice</h1>
 
-  <p>You have a {ptInfo.weight} pound {ptInfo.gender}, presenting with { currentMed.adminReason }. Via online medical direction, you have been ordered to administer { currentMed.dose } of { currentMed.name } via { currentMed.route }. Below is the package your medication comes in. </p>
+  <p>You have a {ptInfo.weight} pound {ptInfo.age} y/o {ptInfo.gender}, presenting with { currentMed.adminReason }. Via online medical direction, you have been ordered to administer { currentMed.dose } of { currentMed.name } via { currentMed.route }. Below is the package your medication comes in. </p>
   <hr />
-  <h2>{ currentMed.name }</h2>
-  <p>
-    Dose On Hand: { currentMed.doseOnHand }, <br />
-    Volume: { currentMed.volume } <br />
-  </p>
-  
+
+  <div class="medication-area">
+    <MedicationCard medication={currentMed} />
+    <MedicationCard medication={currentMed} />
+  </div>
   
   <AppButton on:click={generateNewScenario}/>
 </main>
@@ -86,5 +107,10 @@
     p {
       max-width: none;
     }
+  }
+
+  .medication-area {
+    display: flex;
+    margin: 25px -15px;
   }
 </style>
