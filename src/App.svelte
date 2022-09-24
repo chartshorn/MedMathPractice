@@ -1,12 +1,15 @@
 <script>
   import AppButton from './lib/Button.svelte'
   import MedicationCard from './lib/MedicationCard.svelte'
+  import Spoiler from './lib/Spoiler.svelte'
+  import data from './data/data.json'
 
   //global (config) vars
   const minAdultWeight = 40; // min weight (kilos)
   const maxAdultWeight = 130; // max weight (kilos)
   const minAdultAge = 18; // min adult age (years)
   const maxAdultAge = 99; // max adult age (years)
+  const medList = data.meds;
 
   //function delcaration
   //generates a random number between the min and max
@@ -15,16 +18,32 @@
       max = Math.floor(max);
       return Math.floor(Math.random() * (max - min + 1)) + min;
   }
+
+  //search array for a specific med
+  //arguments - string medName - name of medication to search for
+  //returns - object Medication
+  function searchDataForMed(medName) {
+    for (let i = 0; i < medList.length; i++) {
+      if (medList[i].name === medName) {
+        return medList[i];
+      }
+    }
+  }
   
   //var declaration
-  const currentMed = {
-    name: "Dopamine", // name of med
-    doseOnHand: 400, // dose in mg
-    volume: 250, // volume in mL
-    adminReason: "Hypotension", // reason why you are administering
-    dose: "5mcg/kg/min", // dose ordered
-    route: "IVPB (Infusion)", // route to give med
-    type: "INFUSION"
+  let currentMed = {
+    name: "NAME", // name of med
+    doseOnHand: 0, // dose in mg
+    volume: 0, // volume in mL
+    adminReason: "ADMINREASON", // reason why you are administering
+    dose: "DOSE", // dose ordered
+    doseSuffix: "DOSESUFFIX",
+    doseMin: 0,
+    doseMax: 0,
+    route: "ROUTE", // route to give med
+    type: "TYPE", // Infusion, IVP, ETC
+    order: "ORDER", // is med standing order or require BHO
+    dripset: "DRIPSET"
   }
 
   const ptInfo = {
@@ -35,6 +54,10 @@
   
   //map inputs -> outputs
   const generateNewScenario = () => {
+    //var init
+    let randomMedIndex; // index of random med in medication list
+    let randomDose; // generated random dose of med
+    
     //generate pt info
     //generate pt gender & age
     ptInfo.gender = Math.random() < 0.5 ? "M" : "F";
@@ -42,6 +65,13 @@
     //generate pt weight
     ptInfo.weightKg = getRandomInt(minAdultWeight, maxAdultWeight);
     ptInfo.weight = Math.round(ptInfo.weightKg *2.2);
+    //create new random med
+    randomMedIndex = getRandomInt(0, medList.length-1);
+    currentMed = { ... medList[randomMedIndex] };
+
+    //generate dose
+    randomDose = getRandomInt(currentMed.doseMin, currentMed.doseMax);
+    currentMed.dose = randomDose + currentMed.doseSuffix;
   }
 
   generateNewScenario();
@@ -50,11 +80,10 @@
 <main>
   <h1>Med Math Practice</h1>
 
-  <p>You have a {ptInfo.weight} pound {ptInfo.age} y/o {ptInfo.gender}, presenting with { currentMed.adminReason }. Via online medical direction, you have been ordered to administer { currentMed.dose } of { currentMed.name } via { currentMed.route }. Below is the package your medication comes in. </p>
+  <p>You have a {ptInfo.weight} pound (<spoiler>{ptInfo.weightKg}</spoiler>kg) {ptInfo.age} y/o {ptInfo.gender}, presenting with { currentMed.adminReason }. Via {currentMed.order}, you have been ordered to administer { currentMed.dose } of { currentMed.name } via { currentMed.route }. Below is the package your medication comes in. You have a {currentMed.dripset} gtt/min dripset available. How many drips per minute should you deliver? </p>
   <hr />
 
   <div class="medication-area">
-    <MedicationCard medication={currentMed} />
     <MedicationCard medication={currentMed} />
   </div>
   

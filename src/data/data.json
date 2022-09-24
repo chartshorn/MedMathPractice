@@ -1,0 +1,32 @@
+{
+  "meds": [
+    {
+      "name": "Dopamine",
+      "doseOnHand": 400,
+      "volume": 250,
+      "adminReason": "Hypotension", 
+      "dose": "",
+      "doseSuffix": "mcg/kg/min",
+      "doseMin": 5,
+      "doseMax": 20,
+      "route": "IVPB (Infusion)",
+      "type": "INFUSION",
+      "order": "medical direction",
+      "dripset": 60
+    },
+    {
+      "name": "Lidocaine",
+      "doseOnHand": 2000,
+      "volume": 500,
+      "adminReason": "Symptomatic PVCs", 
+      "dose": "",
+      "doseSuffix": "mg/min",
+      "doseMin": 1,
+      "doseMax": 4,
+      "route": "IVPB (Infusion)",
+      "type": "INFUSION",
+      "order": "standing order",
+      "dripset": 60
+    }
+  ]
+}

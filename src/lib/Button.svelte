@@ -17,9 +17,10 @@
     width: 200px;
     font-variant-numeric: tabular-nums;
     cursor: pointer;
+    transition: border 150ms;
   }
 
-  button:focus {
+  button:hover {
     border: 2px solid #ff3e00;
   }
 
