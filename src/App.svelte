@@ -29,8 +29,24 @@
       }
     }
   }
+
+  //calculate infusion
+  function calculateInfusionDose(medication) {
+    let dose = medication.dose;
+    if (medication.doseSuffix.search("mcg") >= 0) {
+      dose *= 0.001;
+    }
+    if (medication.doseSuffix.search("kg") >= 0) {
+      dose *= ptInfo.weightKg;
+    }
+    //infusion formula (dose per min * dripset) / dose on hand
+    currentMed.calculatedGtt = Math.round((dose * medication.dripset) / (medication.doseOnHand / medication.volume))
+  }
   
   //var declaration
+  let userGtt = 0;
+  let userResult = "";
+  
   let currentMed = {
     name: "NAME", // name of med
     doseOnHand: 0, // dose in mg
@@ -43,13 +59,15 @@
     route: "ROUTE", // route to give med
     type: "TYPE", // Infusion, IVP, ETC
     order: "ORDER", // is med standing order or require BHO
-    dripset: "DRIPSET"
+    dripset: "DRIPSET",
+    calculatedGtt: 0
   }
 
   const ptInfo = {
     gender: "", // gender m/f
-    age: 0,
-    weight: 0 // weight in lbs
+    age: 0, // age in years
+    weight: 0, // weight in lbs
+    weightKg: 0 // weight in kgs
   }
   
   //map inputs -> outputs
@@ -71,23 +89,43 @@
 
     //generate dose
     randomDose = getRandomInt(currentMed.doseMin, currentMed.doseMax);
-    currentMed.dose = randomDose + currentMed.doseSuffix;
+    currentMed.dose = randomDose;
+    //calculate infusion dose
+    calculateInfusionDose(currentMed);
+    //reset user feedback
+    userResult = "-";
   }
 
+  const gradeGuess = () => {
+    const indexOfError = currentMed.calculatedGtt - userGtt;
+    let tempString = ""; 
+    if (indexOfError >= -1 && indexOfError <= 1) {
+      tempString = "Correct.";
+    } else {
+      tempString = "Potentially incorrect."
+    }
+    tempString += " System calculated dose as " + currentMed.calculatedGtt + " gtts/min";
+    userResult = tempString;
+  }
+
+  //init scenario
   generateNewScenario();
 </script>
 
 <main>
   <h1>Med Math Practice</h1>
 
-  <p>You have a {ptInfo.weight} pound (<spoiler>{ptInfo.weightKg}</spoiler>kg) {ptInfo.age} y/o {ptInfo.gender}, presenting with { currentMed.adminReason }. Via {currentMed.order}, you have been ordered to administer { currentMed.dose } of { currentMed.name } via { currentMed.route }. Below is the package your medication comes in. You have a {currentMed.dripset} gtt/min dripset available. How many drips per minute should you deliver? </p>
+  <p>You have a {ptInfo.weight} pound (<Spoiler>{ptInfo.weightKg}</Spoiler>kg) {ptInfo.age} y/o {ptInfo.gender}, presenting with { currentMed.adminReason }. Via {currentMed.order}, you have been ordered to administer { currentMed.dose }{ currentMed.doseSuffix } of { currentMed.name } via { currentMed.route }. Below is the package your medication comes in. You have a {currentMed.dripset} gtt/min dripset available. How many drips per minute should you deliver? </p>
   <hr />
 
   <div class="medication-area">
     <MedicationCard medication={currentMed} />
   </div>
-  
-  <AppButton on:click={generateNewScenario}/>
+  <hr />
+  <p>{userResult}</p>
+  <input type="text" bind:value={userGtt}>
+  <AppButton on:click={gradeGuess}>Check Dose</AppButton>
+  <AppButton on:click={generateNewScenario}>New Scenario</AppButton>
 </main>
 
 <style>

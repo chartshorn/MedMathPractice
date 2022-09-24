@@ -1,13 +1,25 @@
-<main class="spoiler">
+<script>
+  let revealed = false;
+</script>
+
+<span class="spoiler" class:revealed="{revealed===true}" on:click="{() => {revealed=true}}">
   <slot></slot>
-</main>
+</span>
 
 <style>
-  .spoiler {
-    color: green;
+  span {
+    color: black;
+    background-color: black;
+    font-weight: bold;
     transition: 150ms;
     border-radius: 4px;
     display: inline-block;
+    padding: 0 8px;
   }
-  
+  .spoiler.revealed {
+    color: white;
+  }
+  span:hover {
+    cursor:pointer;
+  }
 </style>

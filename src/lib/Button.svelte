@@ -2,7 +2,7 @@
 
 </script>
 
-<button on:click>New Scenario</button>
+<button on:click><slot></slot></button>
 
 <style>
   button {
